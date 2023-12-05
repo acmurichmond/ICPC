@@ -1,0 +1,2 @@
+# ICPC
+For applied algorithms 
