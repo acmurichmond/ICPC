@@ -19,10 +19,9 @@ struct Node {
   bool vo_mark; //special mark for vo = visit outside function
   int depth; //depth from start (in BFS)
   long long dist; //distance from start node (dijkstra)
-  int dij_parent;
   std::vector<int> dij_parents;
 
-  Node(int id) : id(id),pre(-1),post(-1),visited(false),is_post_node(false),resolved_post_node(false),vo_mark(false),depth(std::numeric_limits<int>::max()),dist(std::numeric_limits<long long>::max()),dij_parent(-1) {}
+  Node(int id) : id(id),pre(-1),post(-1),visited(false),is_post_node(false),resolved_post_node(false),vo_mark(false),depth(std::numeric_limits<int>::max()),dist(std::numeric_limits<long long>::max()) {}
 
 };
 
@@ -73,6 +72,7 @@ struct Graph {
 
   //add an unweighted directed edge (directed edge=dedge) to the graph
   //u is start vertex, z is end vertex
+
   void add_dedge(int u, int z) {
     edges[u].insert(z);
     rev_edges[z].insert(u);
@@ -80,10 +80,16 @@ struct Graph {
   }
   //add a weighted edge to the graph
   //u is start vertex, z is end vertex, w is weight
-  void add_dedge(int u, int z, int w) {
+  //it is common for problems to offer duplicate edges, when duplicate_edge_guard is set to true we automatically choose the smaller of the 2 edges. Without this flag, we pick the most recently inserted weight.
+  void add_dedge(int u, int z, int w,bool duplicate_edge_guard=true) {
+
+    if (!duplicate_edge_guard || edges[u].find(z) == edges[u].end() || weights[u][z] > w) {
+      weights[u][z]=w;
+    }
     edges[u].insert(z);
     rev_edges[z].insert(u);
-    weights[u][z]=w;
+  
+
 
   }
   //uedge = unweighted edge
@@ -113,23 +119,6 @@ struct Graph {
     }
   }
 
-  //reverts graph to original state
-  //do not call normally, usually algorithms do necessary resets themselves
-  void reset_all_marks() {
-   num_dead_ends=0;
-   for (int i = 0; i < n; i++) {
-    Node& cur_node = nodes[i];
-    cur_node.pre=-1;
-    cur_node.post=-1;
-    cur_node.depth = std::numeric_limits<int>::max();
-    cur_node.vo_mark=false;
-    cur_node.visited=false;
-    cur_node.is_post_node=false;
-    cur_node.resolved_post_node=false;
-    cur_node.dist=std::numeric_limits<long long>::max();
-
-   }
-  }
 
   std::unordered_set<int> dfs(int start, bool reverse, bool postmark,bool reset_marks);
   std::unordered_set<int> bfs(std::vector<int> starts, bool reverse, bool postmark);

@@ -12,7 +12,7 @@
 //if reverse is true, will use the reverse edges
 //if postmark is true, will keep track of pre and post numbers
 //if reset is false, do not reset the marks 
-std::unordered_set<int> Graph::dfs(int start, bool reverse, bool postmark, bool reset_marks=true) {
+std::unordered_set<int> Graph::dfs(int start, bool reverse=false, bool postmark=false, bool reset_marks=true) {
 
   //reset marks
   if (reset_marks) {
