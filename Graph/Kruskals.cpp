@@ -9,8 +9,7 @@ class DSU {
     int* rank;
 
 public:
-    DSU(int n)
-    {
+    DSU(int n){
         parent = new int[n];
         rank = new int[n];
 
@@ -20,16 +19,14 @@ public:
         }
     }
 
-    int find(int i)
-    {
+    int find(int i){
         if (parent[i] == -1)
             return i;
 
         return parent[i] = find(parent[i]);
     }
 
-    void unite(int x, int y)
-    {
+    void unite(int x, int y){
         int s1 = find(x);
         int s2 = find(y);
 
@@ -53,13 +50,11 @@ class Graph {
 public:
     Graph(int V) { this->V = V; }
 
-    void addEdge(double x, double y, double w)
-    {
+    void addEdge(double x, double y, double w){
         edgelist.push_back({ w, x, y });
     }
 
-    void kruskals_mst()
-    {
+    void kruskals_mst(){
         sort(edgelist.begin(), edgelist.end());
 
         DSU s(V);
@@ -83,7 +78,7 @@ struct Point {
 };
 
 int main(){
-    int m = 5;                                                                                    // number of points in graph
+    int m = 5;                                                                                   // number of points in graph
     
     vector<Point> islands(m);
     
@@ -97,7 +92,7 @@ int main(){
     for (int i = 0; i < m; i++) {
         for (int j = i + 1; j < m; j++) {
             w = pow((islands[i].x - islands[j].x), 2) + pow((islands[i].y - islands[j].y), 2);
-            w = sqrt(w);                                                                         // calculate distance between points and add edge to graph
+            w = sqrt(w);                                                                         // calculate distance between points and add edge to graph, skip if weights known
             g.addEdge((double)i, (double)j, w);
         }
     }
