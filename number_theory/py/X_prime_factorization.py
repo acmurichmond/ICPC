@@ -14,6 +14,8 @@ def primeFactors(n):
         primes.append(int(n))
     return primes
 
+
+#The rest is open kattis test case - under review
 from sys import stdin
 for line in stdin:
     string = ""
