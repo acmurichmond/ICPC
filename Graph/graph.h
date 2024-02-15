@@ -27,6 +27,8 @@ struct Node {
 
 struct Graph {
 
+  typedef long long ll;
+
   const long long INF = std::numeric_limits<long long>::max();
   const long long NEG_INF = std::numeric_limits<long long>::min();
 
@@ -48,7 +50,7 @@ struct Graph {
   //the reverse edges in the graph
   std::unordered_map<int,std::unordered_set<int>> rev_edges;
   //stores the weight of each edge, only for the edges in the graph
-  std::unordered_map<int,std::unordered_map<int,int>> weights; 
+  std::unordered_map<int,std::unordered_map<int,float>> weights; 
 
   //graph constructor just takes the number of vertices in the graph
   Graph(int n) : n(n) {
@@ -59,7 +61,7 @@ struct Graph {
     for (int i = 0; i < n; i++) {
       edges[i] = std::unordered_set<int>();
       rev_edges[i] = std::unordered_set<int>();
-      weights[i]=std::unordered_map<int,int>();
+      weights[i]=std::unordered_map<int,float>();
       nodes.push_back(Node(i));
     }
     order_num=0;
@@ -81,7 +83,7 @@ struct Graph {
   //add a weighted edge to the graph
   //u is start vertex, z is end vertex, w is weight
   //it is common for problems to offer duplicate edges, when duplicate_edge_guard is set to true we automatically choose the smaller of the 2 edges. Without this flag, we pick the most recently inserted weight.
-  void add_dedge(int u, int z, int w,bool duplicate_edge_guard=true) {
+  void add_dedge(int u, int z, float w,bool duplicate_edge_guard=true) {
 
     if (!duplicate_edge_guard || edges[u].find(z) == edges[u].end() || weights[u][z] > w) {
       weights[u][z]=w;
@@ -97,7 +99,7 @@ struct Graph {
     add_dedge(u,z);
     add_dedge(z,u);
   }
-  void add_uedge(int u, int z, int w) {
+  void add_uedge(int u, int z, float w) {
     add_dedge(u,z,w);
     add_dedge(z,u,w);
   }
@@ -132,6 +134,9 @@ struct Graph {
   std::vector<std::vector<long long>> floyd_warshall();
   Graph random_graph(int n, int edge_chance, int min_weight, int max_weight);
   bool bellman_ford(int s, bool reverse, bool reset);
+
+  std::vector<std::pair<int,int>> prims();
+  std::vector<std::pair<int,int>> kruskals();
 
 };
 

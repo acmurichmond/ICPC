@@ -1,6 +1,9 @@
 # Binary Tree in Python
 #General Implementation
 
+#Reviewed by Caitlin, Andrew. 
+#Files provide example of post, pre, in order traversals but wouldn't be directly used. Also, should be present in C++ as well as Python.
+#(Seems correct, needs improvement)
 
 class Node:
     def __init__(self, key):

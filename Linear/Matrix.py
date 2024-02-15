@@ -1,3 +1,6 @@
+#Written by Joseph.
+#Reviewed by Andrew, 2.1.24. matrixAdd, matrixMult, matrixPower look correct. gauss_jordan_inverse, eigenDecomp unclear if work. 
+#zip(*matrix) gives transpose
 from fractions import Fraction
 import math
 
@@ -5,7 +8,7 @@ def matrixAdd(matrix_A, matrix_B):
     return [[matrix_A[i][j] + matrix_B[i][j]  for j in range (len(matrix_A[0]))] for i in range(len(matrix_A))]
 
 def matrixMult(matrix_A, matrix_B):
-    #O(n^3)
+    #O(n^3) 
     return [[sum(A * B for A, B in zip(row_A, col_B)) for col_B in zip(*matrix_B)] for row_A in matrix_A]
 
 def matrixPower(matrix_A, n):

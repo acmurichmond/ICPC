@@ -26,6 +26,7 @@ void printMSTWeight(vector<int>& parent, vector<vector<double>>& graph, int V) {
     double w = 0;
 
     for (int i = 1; i < V; i++) {
+        std::cout << "mst edge " << i << " " << parent[i] << std::endl;
         w += graph[i][parent[i]];
     }
 
