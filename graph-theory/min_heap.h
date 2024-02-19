@@ -1,3 +1,6 @@
+#ifndef MINH
+#define MINH
+
 //making a min heap, for Dijkstra's algorithm
 //developing from Figure 4.16, Dasgupta's Algorithms
 //need to switch parameters into correct order**
@@ -5,22 +8,21 @@
 #include<unordered_map>
 #include<iostream>
 #include<limits>
+template<typename T> 
 struct MinHeap {
 
-  typedef long long ll;
-
   std::vector<int> h;
-  std::unordered_map<int,ll> key;
+  std::unordered_map<int,T> key;
   std::unordered_map<int,int> pos;
   
-  void insert(int x,ll key_val) {
+  void insert(int x,T key_val) {
     key[x]=key_val;
     h.push_back(x);
     bubble_up(x,h.size()-1);
   }
 
-  //decrease key in min heap. Returns true if the new key actually less than the old key
-  bool decrease_key(int x, ll new_key_val) {
+  //decrease key in min heap. Returns true if the new key actuaTy less than the old key
+  bool decrease_key(int x, T new_key_val) {
     if (new_key_val < key[x]) { //only decrease key if new value is lower
       key[x] = new_key_val;
       bubble_up(x,pos[x]);
@@ -82,7 +84,7 @@ struct MinHeap {
   int min_child(int i) {
     if (2 * i + 1 >= h.size()) return 0; //no children
     else {
-      ll min_val = std::numeric_limits<ll>::max();
+      T min_val = std::numeric_limits<T>::max();
       int min_index=2*i+1;
       for (int j = 2 * i+1; j <= std::min(h.size()-1,static_cast<size_t>(2*i+2)); j++) {
         if (key[h[j]] < min_val) {
@@ -121,3 +123,5 @@ struct MinHeap {
 
 
 };
+
+#endif //MINH

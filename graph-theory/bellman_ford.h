@@ -1,22 +1,50 @@
-//bellman ford algorithm
-#include "graph.h"
-#include "dfs.h"
+#ifndef BELL
+#define BELL
+#include<limits>
+#include<unordered_map>
+#include<vector>
+#include<unordered_set>
+#include<deque>
 
-//returns true if negative weight cycle
-//TODO implement reverse feature (not currently implemented)
-bool Graph::bellman_ford(int s, bool reverse=false, bool reset=true) {
-  typedef long long ll;
-  if (reset) {
-    for (int i = 0; i < n; i++) {
-      nodes[i].dist=INF;
-    }
+
+//helper dfs for bellman ford, for finding all of the negative inf cycles
+//marks all nodes visited with neginf 
+template<typename T> 
+void bellman_dfs(const int n, std::unordered_map<int,std::unordered_map<int,T> >& edges, int start,std::vector<bool>& visited, std::vector<T>& dist, T NEG_INF) {
+
+  std::deque<int> stack; //stores our dfs stack
+  stack.push_back(start);
+
+  while (stack.size() > 0) {
+    int s = stack.back(); //we pop from back of stack
+    stack.pop_back();
+    dist[s]=NEG_INF;
    
+    //if we haven't yet visited this node
+    if (! visited[s]) {
+      visited[s]=true;
+      //for each neighbor
+      for (const auto& kvp : edges[s]) { //kvp = key value pair
+        //if we haven't visited it yet
+        if (!visited[kvp.first]) stack.push_back(kvp.first);
+
+      }
+    }
   }
-  if (reverse==true) {
-    std::cout << "Feature not set, aborting" <<std::endl;
-    exit(7);
-  }
-  nodes[s].dist=0;
+ 
+}
+
+//returns vector of shortest path from s to all other vertices
+//if any of these weights is numeric limits min, then there is a negative weight cycle
+//n : # of vertices
+//s : start vertex
+//T: distance type (int, long long, or float)
+template <typename T>
+std::vector<T> bellman_ford(const int n, std::unordered_map<int,std::unordered_map<int,T> >& edges, int s, T INF, T NEG_INF) {
+
+  std::vector<T> dist(n,std::numeric_limits<T>::max());
+  
+  dist[s]=0;
 
   bool update_made=true;
 
@@ -24,9 +52,9 @@ bool Graph::bellman_ford(int s, bool reverse=false, bool reset=true) {
     update_made=false;
     //for each edge
     for (int j = 0; j < n; j++) {
-      for (int k : edges[j]) {
-        if (nodes[j].dist != INF && nodes[j].dist + weights[j][k] < nodes[k].dist) {
-          nodes[k].dist=nodes[j].dist+weights[j][k];
+      for (const auto& kvp : edges[j]) { //kvp = key value pair
+        if (dist[j] != INF && dist[j] + kvp.second < dist[kvp.first]) {
+          dist[kvp.first]=dist[j]+kvp.second;
           update_made=true;
         }
 
@@ -40,38 +68,34 @@ bool Graph::bellman_ford(int s, bool reverse=false, bool reset=true) {
   }
 
   bool any_neg = false;
+  
 
   for (int j = 0; j < n; j++) {
-    for (int k : edges[j]) { 
-      if ((nodes[j].dist != INF && nodes[j].dist + weights[j][k] < nodes[k].dist) || nodes[j].dist==NEG_INF) {
-        nodes[k].dist = NEG_INF;
+    for (const auto& kvp : edges[j]) { 
+      if ((dist[j] != INF && dist[j] + kvp.second < dist[kvp.first]) || dist[j]==NEG_INF) {
+        dist[kvp.first]= NEG_INF;
         any_neg=true;
       }
     }
   }
+
+
   if (any_neg) {
+    std::vector<bool> visited(n,false);
+
+    //all nodes reachable from a NEG_INF node are NEG_INF
     for (int i = 0; i < n; i++) {
-      nodes[i].is_post_node=false;
-      nodes[i].resolved_post_node=false;
-      nodes[i].visited=false;
-
-    }
-
-  //all nodes reachable from a NEG_INF node are NEG_INF
-  for (int i = 0; i < n; i++) {
-    if (nodes[i].dist == NEG_INF && !nodes[i].visited) {
-      auto visited_nodes = dfs(i,false,false,false); //dfs without resetting marks
-      for (int j : visited_nodes) {
-        nodes[j].dist=NEG_INF;
+      if (dist[i] == NEG_INF && !visited[i]) {
+        //TODO could do bfs instead here (but this works)
+        bellman_dfs(n,edges,i,visited,dist,NEG_INF); //mark all visited nodes with negative infinity
+       
       }
     }
-  }
 
   }
-
-
- 
-  return any_neg;
-
+  return dist;
   
 }
+
+
+#endif

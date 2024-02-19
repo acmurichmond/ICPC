@@ -1,4 +1,3 @@
-#include "graph.h"
 #include<unordered_set> 
 #include<unordered_map>
 #include<queue>
@@ -7,48 +6,28 @@
 
 #include "min_heap.h"
 
-void Graph::dijkstra(int start, bool reverse=false, bool reset=true) {
-
-
-  typedef long long ll;
-
-  //std::cout << "starting dijkstra" << std::endl;
-  if (reset) {
-    for (int i = 0; i < n; i++) {
-      nodes[i].dist=std::numeric_limits<int>::max();
-      nodes[i].dij_parents.clear();
-    }
+template<typename T>
+struct DijNode {
+  int id;
+  T dist;
+  bool valid;
+  std::vector<int> parents;
+  bool resolved;
+  DijNode(int id,T dist) : id(id),dist(dist),valid(true),resolved(false) {
+    parents=std::vector<int>();
   }
 
-  std::unordered_map<int,std::unordered_set<int>>* my_edges;
-  //use reverse boolean to determine which edge set to use
-  if (reverse) {
-    my_edges=&rev_edges;
-  }
-  else {
-    my_edges=&edges;
-  }
+  DijNode() {}
+  
+};
+//we assume dists is reset to infinity at the start
+template<typename T>
+void dijkstra(const int n, std::unordered_map<int,std::unordered_map<int,T> >& edges, int start,std::vector<T>& dists,std::vector<std::vector<int>>& parents, T INF) {
 
-  struct DijNode {
-    int id;
-    ll dist;
-    bool valid;
-    std::vector<int> parents;
-    bool resolved;
-    DijNode(int id,ll dist) : id(id),dist(dist),valid(true),resolved(false) {
-      parents=std::vector<int>();
-    }
-    DijNode() : id(-1),dist(std::numeric_limits<ll>::max()),valid(false),resolved(false) {
-      parents=std::vector<int>();
-    }
-  };
-
-
-
-  MinHeap my_heap;
-  std::unordered_map<int,DijNode> dij_nodes;
+  MinHeap<T> my_heap;
+  std::unordered_map<int,DijNode<T>> dij_nodes;
   for (int i = 0; i < n; i++) {
-    dij_nodes[i] = DijNode(i,INF);
+    dij_nodes[i] = DijNode<T>(i,INF);
   }
 
   for (int i = 0; i < n; i++) {
@@ -63,12 +42,12 @@ void Graph::dijkstra(int start, bool reverse=false, bool reset=true) {
   
   while (!my_heap.empty()) {
  
-    DijNode& a = dij_nodes[my_heap.delete_min()];
+    DijNode<T>& a = dij_nodes[my_heap.delete_min()];
 
 
-    nodes[a.id].dist=a.dist; //write in the answer
+    dists[a.id]=a.dist; //write in the answer
     for (int i = 0; i < a.parents.size(); i++) {
-      nodes[a.id].dij_parents.push_back(a.parents[i]);
+      parents[a.id].push_back(a.parents[i]);
     }
     dij_nodes[a.id].resolved=true;
 
@@ -79,11 +58,11 @@ void Graph::dijkstra(int start, bool reverse=false, bool reset=true) {
     // my_heap.print();
 
 
-    for (int edge_node : (*my_edges)[a.id]) {
+    for (const auto& kvp : edges[a.id]) {//continue here 
+      int edge_node = kvp.first;
       if (!dij_nodes[edge_node].resolved) { //if this node has not yet been set
-        int added_weight;
-        if (reverse) added_weight=weights[edge_node][a.id];
-        else added_weight=weights[a.id][edge_node];
+        int added_weight=kvp.second;
+       
 
         if (added_weight + a.dist < dij_nodes[edge_node].dist) {
           dij_nodes[edge_node].dist = a.dist+added_weight;

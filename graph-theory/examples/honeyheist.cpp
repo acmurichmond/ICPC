@@ -3,8 +3,8 @@
 #include<iostream>
 #include<unordered_map>
 #include<vector>
-
-#include "graph.h"
+#include<unordered_set> 
+#include<limits>
 #include "bfs.h"
 
 int main() {
@@ -23,7 +23,9 @@ int main() {
 
   }
 
-  Graph g(num_tiles+1);
+  int n = num_tiles+1;
+  std::unordered_map<int,std::unordered_map<int,int> > edges;
+
   //for each row
   int num_tiles_seen = 1; //graph ids start at 1
   int tiles_in_row = R;
@@ -33,7 +35,8 @@ int main() {
       int tile_val = num_tiles_seen + j;
       //if we can move right
       if (j < tiles_in_row-1 && !is_wax[tile_val] && !is_wax[tile_val+1]) {
-        g.add_uedge(tile_val,tile_val+1);
+        edges[tile_val][tile_val+1]=1;
+        edges[tile_val+1][tile_val]=1;
       }
     }
     //if we are in a row where moving down, the row size increases
@@ -41,11 +44,15 @@ int main() {
       for (int j = 0; j < tiles_in_row; j++) {
         int tile_val = num_tiles_seen + j;
         if (!(is_wax[tile_val]) && !(is_wax[tile_val+tiles_in_row])) {
-          g.add_uedge(tile_val,tile_val+tiles_in_row);
+          edges[tile_val][tile_val+tiles_in_row]=1;
+          edges[tile_val+tiles_in_row][tile_val]=1;
+
 
         }
         if (!(is_wax[tile_val]) && !(is_wax[tile_val+tiles_in_row+1])) {
-          g.add_uedge(tile_val,tile_val+tiles_in_row+1);
+          edges[tile_val][tile_val+tiles_in_row+1]=1;
+          edges[tile_val+tiles_in_row+1][tile_val]=1;
+
 
         }
        
@@ -61,24 +68,28 @@ int main() {
         int tile_val = num_tiles_seen + j;
         if (!(is_wax[tile_val]) && !(is_wax[tile_val+tiles_in_row])) {
 
-        g.add_uedge(tile_val,tile_val+tiles_in_row);
+           edges[tile_val][tile_val+tiles_in_row]=1;
+          edges[tile_val+tiles_in_row][tile_val]=1;
         }
         if (!(is_wax[tile_val]) && !(is_wax[tile_val+tiles_in_row-1])) {
 
-        g.add_uedge(tile_val,tile_val+tiles_in_row-1);
+         edges[tile_val][tile_val+tiles_in_row-1]=1;
+          edges[tile_val+tiles_in_row-1][tile_val]=1;
         }
 
       }
       //j=0 case, just add tiles_in_row
       int tile_val = num_tiles_seen;
      if (!(is_wax[tile_val]) && !(is_wax[tile_val+tiles_in_row])) {
-      g.add_uedge(tile_val,tile_val+tiles_in_row);
+          edges[tile_val][tile_val+tiles_in_row]=1;
+          edges[tile_val+tiles_in_row][tile_val]=1;
      }
       //j=tiles_in_row-1 case, just add tiles_in_row-1
       tile_val=num_tiles_seen + tiles_in_row-1;
 
       if (!(is_wax[tile_val]) && !(is_wax[tile_val+tiles_in_row-1])) {
-        g.add_uedge(tile_val,tile_val+tiles_in_row-1);
+            edges[tile_val][tile_val+tiles_in_row-1]=1;
+          edges[tile_val+tiles_in_row-1][tile_val]=1;
       }
 
 
@@ -99,9 +110,10 @@ int main() {
 
   std::vector<int> starts;
   starts.push_back(A);
-  g.bfs(starts); //run the actual bfs
-  if (g.nodes[B].depth <= N) {
-    std::cout << g.nodes[B].depth << std::endl;
+  std::vector<int> depths(n,std::numeric_limits<int>::max());
+  bfs(n,edges,starts,depths); //run the actual bfs
+  if (depths[B] <= N) {
+    std::cout << depths[B] << std::endl;
   }
   else {
     std::cout << "No" << std::endl;

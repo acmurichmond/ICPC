@@ -1,10 +1,10 @@
 #include<iostream>
-#include "graph.h"
 #include "bellman_ford.h"
-#include "dfs.h"
+#include<unordered_map>
 
+//solves kattis problem
+//https://open.kattis.com/problems/shortestpath3
 int main() {
-
 
   int n,m,q,s,t1,t2,t3;
   while (true) {
@@ -12,33 +12,40 @@ int main() {
     if (n==0 && m==0 && q==0 && s==0) {
       break;
     }
-    Graph g(n);
+    std::unordered_map<int,std::unordered_map<int,long long> > edges;
     for (int i = 0; i < m; i++) {
       std::cin >> t1 >> t2 >> t3;
-      //handle case of double edges TODO mark in README
-      if (g.edges[t1].find(t2) != g.edges[t1].end()) {
-        if (t3 < g.weights[t1][t2]) {
-          g.weights[t1][t2]=t3;
-        }
+      //t3 < edges[t1][t2] check handles case of duplicate edges (just use the smaller one always) 
+      if (edges[t1].find(t2) == edges[t1].end() || t3 < edges[t1][t2]) {
+        edges[t1][t2]=t3;
       }
-      else {
-        g.add_dedge(t1,t2,t3);
-
-
-      }
+      
 
     }
-    bool is_inf = g.bellman_ford(s);
+
+    //print edges
+    // for (int i = 0; i < n; i++) {
+    //   std::cout << i << ": ";
+    //   for (const auto& kvp : edges[i]) {
+    //     std::cout << kvp.first << "(" << kvp.second << ") ";
+    //   }
+    //   std::cout << std::endl;
+    // }
+
+
+    long long NEG_INF = std::numeric_limits<long long>::min();
+    long long INF = std::numeric_limits<long long>::max();
+    std::vector<long long> dist = bellman_ford(n,edges,s,INF,NEG_INF);
     for (int i = 0; i < q; i++) {
       std::cin >> t1;
-      if (g.nodes[t1].dist == g.INF) {
+      if (dist[t1]== INF) {
         std::cout << "Impossible" << std::endl;
       }
-      else if (g.nodes[t1].dist == g.NEG_INF) {
+      else if (dist[t1] == NEG_INF) {
         std::cout << "-Infinity" << std::endl;
       }
       else {
-        std::cout << g.nodes[t1].dist << std::endl;
+        std::cout << dist[t1] << std::endl;
       }
     }
 
