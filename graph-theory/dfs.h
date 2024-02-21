@@ -10,6 +10,7 @@
 //returns a set of all the nodes visited
 //start is the start vertex
 //T is type of weight (int or float)
+//WARNING: not directly tested (dfs code in bellman ford, scc was tested though)
 template<typename T> 
 std::unordered_set<int> dfs(const int n, const std::unordered_map<int,std::unordered_map<int,T> >& edges, int start) {
 
